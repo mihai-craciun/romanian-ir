@@ -41,6 +41,8 @@ public class Main {
 
     /** Analyzer */
     private static final Analyzer ANALYZER = new RomanianCustomAnalyzer();
+    /** Query match type */
+    private static final QueryParser.Operator OPERATOR = QueryParser.Operator.AND;
 
     /** Main method */
     public static void main(String[] args) throws IOException, ParseException {
@@ -82,6 +84,7 @@ public class Main {
         String queryString;
 
         QueryParser queryParser = new QueryParser(FIELD_CONTENTS, ANALYZER);
+        queryParser.setDefaultOperator(OPERATOR);
 
         while (true) {
             System.out.println("Enter a query string: ");
