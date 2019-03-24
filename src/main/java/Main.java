@@ -4,7 +4,6 @@
  */
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.ro.RomanianAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -40,6 +39,9 @@ public class Main {
     private static final String FIELD_CONTENTS = "contents";
     private static final String FIELD_FILENAME = "filename";
 
+    /** Analyzer */
+    private static final Analyzer ANALYZER = new RomanianCustomAnalyzer();
+
     /** Main method */
     public static void main(String[] args) throws IOException, ParseException {
         createIndex();
@@ -50,9 +52,8 @@ public class Main {
     private static void createIndex() throws IOException {
         // Create the index writer
         deleteOldIndex();
-        Analyzer analyzer = new RomanianAnalyzer();
         Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(ANALYZER);
         IndexWriter indexWriter = new IndexWriter(directory, config);
 
         // Index all files in the working directory
@@ -80,8 +81,7 @@ public class Main {
         IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
         String queryString;
 
-        Analyzer analyzer = new RomanianAnalyzer();
-        QueryParser queryParser = new QueryParser(FIELD_CONTENTS, analyzer);
+        QueryParser queryParser = new QueryParser(FIELD_CONTENTS, ANALYZER);
 
         while (true) {
             System.out.println("Enter a query string: ");
