@@ -19,10 +19,17 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
@@ -61,15 +68,20 @@ public class Main {
         // Index all files in the working directory
         File dir = new File(WORKING_DIRECTORY);
         File[] files = dir.listFiles();
+
+        System.out.println("Indexing files..");
+        System.out.println();
         for (File file : files) {
             Document document = new Document();
+            String fileText = fileParser(file);
 
             document.add(new StringField(FIELD_PATH, file.toString(), Field.Store.YES));
             document.add(new StringField(FIELD_FILENAME, file.getName(), Field.Store.YES));
-            document.add(new TextField(FIELD_CONTENTS, new String(Files.readAllBytes(file.toPath())), Field.Store.YES));
+            document.add(new TextField(FIELD_CONTENTS, fileText, Field.Store.YES));
 
             indexWriter.addDocument(document);
         }
+        System.out.println();
         indexWriter.close();
 
     }
@@ -101,6 +113,24 @@ public class Main {
                 System.out.println(doc.get(FIELD_FILENAME) + " (" + doc.get(FIELD_PATH) + ")");
             }
         }
+    }
+
+    private static String fileParser(File file) throws IOException {
+        Tika tika = new Tika();
+        System.out.println(file.getName() + " (" + tika.detect(file) + ")");
+
+        if (!file.exists() || file.length() == 0) {
+            System.err.println("No content detected");
+            return "";
+        }
+        String filecontent = null;
+        try {
+            filecontent = tika.parseToString(file);
+        } catch (TikaException e) {
+            System.err.println("Failed to parse file with tika");
+            e.printStackTrace();
+        }
+        return filecontent;
     }
 
     /** Create unexisting folders and remove old index data fi exists */
