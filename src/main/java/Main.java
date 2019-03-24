@@ -53,7 +53,7 @@ public class Main {
     /** Analyzes the documents and creates an indexer */
     private static void createIndex() throws IOException {
         // Create the index writer
-        deleteOldIndex();
+        prepareEnvironment();
         Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
         IndexWriterConfig config = new IndexWriterConfig(ANALYZER);
         IndexWriter indexWriter = new IndexWriter(directory, config);
@@ -103,10 +103,18 @@ public class Main {
         }
     }
 
-    /** Clears the index workspace by deleting all existent files */
-    private static void deleteOldIndex() {
-        File dir = new File(INDEX_DIRECTORY);
-        for(File file: dir.listFiles())
+    /** Create unexisting folders and remove old index data fi exists */
+    private static void prepareEnvironment() {
+        File working_dir = new File(WORKING_DIRECTORY);
+        File index_dir = new File(INDEX_DIRECTORY);
+        if (!working_dir.exists()) {
+            working_dir.mkdirs();
+        }
+        if (index_dir.exists()) {
+            for(File file: index_dir.listFiles())
                 file.delete();
+        } else {
+            index_dir.mkdirs();
+        }
     }
 }
