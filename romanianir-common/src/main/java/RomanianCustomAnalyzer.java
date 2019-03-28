@@ -11,6 +11,7 @@
  * @author Mihai Craciun
  */
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
@@ -19,7 +20,9 @@ import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.tartarus.snowball.ext.RomanianStemmer;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Romanian analyzer with removed diacritics */
 public final class RomanianCustomAnalyzer extends StopwordAnalyzerBase {
@@ -60,10 +63,11 @@ public final class RomanianCustomAnalyzer extends StopwordAnalyzerBase {
         TokenStream result = source;
         result = new LowerCaseFilter(result);
         result = new StopFilter(result, stopwords);
-        if(!stemExclusionSet.isEmpty())
-            result = new SetKeywordMarkerFilter(result, stemExclusionSet);
-        result = new SnowballFilter(result, new RomanianStemmer());
         result = new ASCIIFoldingFilter(result);
+        if(!stemExclusionSet.isEmpty()) {
+            result = new SetKeywordMarkerFilter(result, stemExclusionSet);
+        }
+        result = new SnowballFilter(result, new RomanianStemmer());
         return new TokenStreamComponents(source, result);
     }
 }

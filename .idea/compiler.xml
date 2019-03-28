@@ -7,9 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="romanianir-common" />
+        <module name="romanianir-index" />
         <module name="romanianir-search" />
         <module name="RomanianIRSystem" />
-        <module name="romanianir-index" />
       </profile>
     </annotationProcessing>
   </component>

@@ -3,10 +3,14 @@
  * Eugen-Mihai Craciun
  */
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.queryparser.classic.QueryParser;
 
-import java.io.File;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Settings {
 
@@ -21,9 +25,33 @@ public class Settings {
     public static final String FIELD_FILENAME = "filename";
 
     /** Analyzer */
-    public static final Analyzer ANALYZER = new RomanianCustomAnalyzer();
+    public static final Analyzer ANALYZER;
     /** Query match type */
     public static final QueryParser.Operator OPERATOR = QueryParser.Operator.AND;
 
-    /** Main method */
+    /** Try to initialize the analyzer with custom stopwords file */
+    static {
+        File stopWords = new File("stopwords-ro.txt");
+        List<String> stopWordsList = new ArrayList<>();
+        BufferedReader reader = null;
+        CharArraySet stopWordsSet = null;
+        try {
+            reader = new BufferedReader(new FileReader(stopWords));
+            String word;
+            while ((word = reader.readLine()) != null)
+                stopWordsList.add(StringUtils.stripAccents(word));
+            stopWordsSet = new CharArraySet(stopWordsList, false);
+        } catch (FileNotFoundException e) {
+            System.err.println("Could not open stop words file for read");
+        } catch (IOException e) {
+            System.err.println("Could not read from file");
+        }
+
+        if (stopWordsSet != null) {
+            System.out.println("Using stopwords file");
+            ANALYZER = new RomanianCustomAnalyzer(stopWordsSet);
+        } else {
+            ANALYZER = new RomanianCustomAnalyzer();
+        }
+    }
 }
