@@ -17,7 +17,6 @@ import org.apache.lucene.store.FSDirectory;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.rmi.ServerError;
 import java.util.Scanner;
 
 public class Main {
@@ -33,7 +32,6 @@ public class Main {
             String queryString;
 
             QueryParser queryParser = new QueryParser(Settings.FIELD_CONTENTS, Settings.ANALYZER);
-            queryParser.setDefaultOperator(Settings.OPERATOR);
 
             while (true) {
                 System.out.println("Enter a query string: ");

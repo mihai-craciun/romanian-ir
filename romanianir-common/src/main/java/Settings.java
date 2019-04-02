@@ -7,17 +7,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.yaml.snakeyaml.Yaml;
 
+import javax.management.QueryEval;
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Settings {
 
     /** Documents directory calculated using a relative path */
-    public static String WORKING_DIRECTORY = new File("documents").getAbsolutePath();
+    public static String DOCUMENTS_DIRECTORY = new File("documents").getAbsolutePath();
     /** Index directory calculated using a relative path */
     public static String INDEX_DIRECTORY = new File("index").getAbsolutePath();
+    /** Configuration file */
+    public static String CONFIG_FILE = new File("config.yml").getAbsolutePath();
+    /** Stopwords file */
+    public static String STOPWORDS_FILE = new File("stopwords-ro.txt").getAbsolutePath();
+
+    /* Config file fields */
+    public static final String CONFIG_DOCUMENTS_DIRECTORY = "documents";
+    public static final String CONFIG_INDEX_DIRECTORY = "index";
+    public static final String CONFIG_STOPWORDS_FILE = "stopwords";
 
     /* Lucene document fields */
     public static final String FIELD_PATH = "path";
@@ -26,12 +39,33 @@ public class Settings {
 
     /** Analyzer */
     public static final Analyzer ANALYZER;
-    /** Query match type */
-    public static final QueryParser.Operator OPERATOR = QueryParser.Operator.AND;
 
     /** Try to initialize the analyzer with custom stopwords file */
     static {
-        File stopWords = new File("stopwords-ro.txt");
+        Yaml yaml = new Yaml();
+        Map<String, Object> yamlContent = null;
+        try {
+            yamlContent = yaml.load(new FileInputStream(CONFIG_FILE));
+            if (yamlContent == null) {
+                System.err.println("Config file could not pe parsed. Using default settings");
+            } else {
+                String documentsDirectory = (String) yamlContent.get(CONFIG_DOCUMENTS_DIRECTORY);
+                if (documentsDirectory != null) {
+                    DOCUMENTS_DIRECTORY = documentsDirectory;
+                }
+                String indexDirectory = (String) yamlContent.get(CONFIG_INDEX_DIRECTORY);
+                if (indexDirectory != null) {
+                    INDEX_DIRECTORY = indexDirectory;
+                }
+                String stopwordsFile = (String) yamlContent.get(CONFIG_STOPWORDS_FILE);
+                if (stopwordsFile != null) {
+                    STOPWORDS_FILE = stopwordsFile;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Config file not found. Using default settings");
+        }
+        File stopWords = new File(STOPWORDS_FILE);
         List<String> stopWordsList = new ArrayList<>();
         BufferedReader reader = null;
         CharArraySet stopWordsSet = null;

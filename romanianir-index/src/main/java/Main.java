@@ -28,7 +28,7 @@ public class Main {
         IndexWriter indexWriter = new IndexWriter(directory, config);
 
         // Index all files in the working directory
-        File dir = new File(Settings.WORKING_DIRECTORY);
+        File dir = new File(Settings.DOCUMENTS_DIRECTORY);
         File[] files = dir.listFiles();
 
         System.out.println("Indexing files..");
@@ -50,7 +50,7 @@ public class Main {
 
     /** Create unexisting folders and remove old index data fi exists */
     private static void prepareEnvironment() {
-        File working_dir = new File(Settings.WORKING_DIRECTORY);
+        File working_dir = new File(Settings.DOCUMENTS_DIRECTORY);
         File index_dir = new File(Settings.INDEX_DIRECTORY);
         if (!working_dir.exists()) {
             working_dir.mkdirs();
