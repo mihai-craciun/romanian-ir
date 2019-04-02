@@ -3,6 +3,7 @@
  * Eugen-Mihai Craciun
  */
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -37,6 +38,7 @@ public class Main {
             while (true) {
                 System.out.println("Enter a query string: ");
                 queryString = keyboard.nextLine();
+                queryString = StringUtils.stripAccents(queryString);
 
                 Query query = null;
                 try {
